@@ -9,6 +9,9 @@ import UIKit
 
 class ViewController: UIViewController, NetworkingDelegate {
 
+  var mobileNetwork: String = "ATT"
+
+
   @IBOutlet weak var tableView: UITableView!
 
   var saveData: String = ""
@@ -31,7 +34,8 @@ class ViewController: UIViewController, NetworkingDelegate {
 
     let networking = Networking() //https://itunes.apple.com/search?term=jack+johnson
     networking.delegate = self
-    networking.getData(for: "https://itunes.apple.com/search?term=jack+johnson") { result in
+    networking.getData(for: "https://itunes.apple.com/search?term=jack+johnson") { [weak self] result in
+      print(self?.mobileNetwork)
       DispatchQueue.main.async {
         switch result {
         case .success(let response):

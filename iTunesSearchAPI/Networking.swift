@@ -10,6 +10,7 @@ import Foundation
 typealias CompletionHandler = (Result<String,Networking.NetworkError>) -> Void
 
 protocol NetworkingDelegate: AnyObject   {
+  var mobileNetwork: String { get set }
   func didReceiveResponse(_ response: String)
   func didReceiveError(_ error: Networking.NetworkError)
 }
@@ -47,8 +48,9 @@ class Networking {
       completion(.failure(.badURLError))
       return
     }
+    print(self.delegate?.mobileNetwork)
+    self.delegate?.mobileNetwork = "T-Mobile"
     let task = session.dataTask(with: url) {[weak self] data, response, error in
-
       // ensure there is no error for this HTTP response
       guard error == nil else {
         print ("error: \(error!)")
