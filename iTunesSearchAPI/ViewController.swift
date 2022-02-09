@@ -7,20 +7,17 @@
 
 import UIKit
 
-class ViewController: UIViewController, NetworkingDelegate {
+class ViewController: UIViewController {
 
-  var mobileNetwork: String = "ATT"
-
-
+  @IBOutlet weak var imageView: UIImageView!
   @IBOutlet weak var tableView: UITableView!
 
   var saveData: String = ""
-  var countries:[String] = ["US", "UK", "ITALY"]
-  var asia:[String] = ["INDIA", "JAPAN","CHINA"]
-
+  var album = [Album]()
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    downloadAndshowAppleLogo()
     setUpTableView()
     getiTunesAPI()
   }
@@ -29,52 +26,55 @@ class ViewController: UIViewController, NetworkingDelegate {
     self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "basicStyleCell")
   }
 
+  fileprivate func downloadAndshowAppleLogo() {
+    DispatchQueue.global(qos: .userInitiated).async {
+      do {
+        let imageData = try Data(contentsOf: URL(string: "https://1000logos.net/wp-content/uploads/2016/10/Apple-Logo.png")!)
+        DispatchQueue.main.async {
+          self.imageView.image = UIImage(data: imageData)
+        }
+      } catch {
+        print(error.localizedDescription)
+      }
+    }
+  }
+
   fileprivate func getiTunesAPI() {
     // Do any additional setup after loading the view.
-
-    let networking = Networking() //https://itunes.apple.com/search?term=jack+johnson
-    networking.delegate = self
+    let networking = Networking()
     networking.getData(for: "https://itunes.apple.com/search?term=jack+johnson") { [weak self] result in
-      print(self?.mobileNetwork)
       DispatchQueue.main.async {
         switch result {
         case .success(let response):
-          print(response)
+//          let decoder = JSONDecoder()
+//
+//          do {
+//              let decoded = try decoder.decode([Albums].self, from: data)
+//              print(decoded[0].name)
+//          } catch {
+//              print("Failed to decode JSON")
+//          }
+          self?.album = response.results
+          self?.tableView.reloadData()
+          break
+
         case .failure(let error):
           print(error.description)
         }
       }
     }
   }
-
-  // MARK: NetworkDelegate
-  func didReceiveResponse(_ response: String) {
-    DispatchQueue.main.async {
-      print(response)
-    }
-  }
-
-  func didReceiveError(_ error: Networking.NetworkError) {
-    DispatchQueue.main.async {
-      print(error.description)
-    }
-  }
-
-
 }
 
 extension ViewController: UITableViewDataSource {
   // MARK: UITableviewDataSource
 
   func numberOfSections(in tableView: UITableView) -> Int {
-    return 2
+    return 1
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if section == 1 {
-      return asia.count
-    }
-    return countries.count
+    return album.count
   }
 
   func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -87,22 +87,14 @@ extension ViewController: UITableViewDataSource {
 
      // Configure the cell’s contents with the row and section number.
      // The Basic cell style guarantees a label view is present in textLabel.
-    if indexPath.section == 1 {
-      cell.textLabel!.text = asia[indexPath.row]
-    } else {
-     cell.textLabel!.text = countries[indexPath.row]
-    }
+      cell.textLabel!.text = album[indexPath.row].trackName
      return cell
   }
 }
 
 extension ViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if indexPath.section == 1 {
-      print(asia[indexPath.row])
-    } else {
-      print(countries[indexPath.row])
+      print(album[indexPath.row])
     }
-  }
-
 }
+

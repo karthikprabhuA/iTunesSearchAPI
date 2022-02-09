@@ -7,18 +7,9 @@
 
 import Foundation
 
-typealias CompletionHandler = (Result<String,Networking.NetworkError>) -> Void
-
-protocol NetworkingDelegate: AnyObject   {
-  var mobileNetwork: String { get set }
-  func didReceiveResponse(_ response: String)
-  func didReceiveError(_ error: Networking.NetworkError)
-}
-
+typealias CompletionHandler = (Result<Albums,Networking.NetworkError>) -> Void
 
 class Networking {
-
-  weak var delegate: NetworkingDelegate?
 
   enum NetworkError: Error {
     case badURLError
@@ -40,21 +31,19 @@ class Networking {
     }
 
   }
+  //
   func getData(for url: String, completion: @escaping CompletionHandler) {
     let config = URLSessionConfiguration.default
     let session = URLSession(configuration: config)
     guard let url = URL(string: url) else {
-      self.delegate?.didReceiveError(.badURLError)
       completion(.failure(.badURLError))
       return
     }
-    print(self.delegate?.mobileNetwork)
-    self.delegate?.mobileNetwork = "T-Mobile"
+
     let task = session.dataTask(with: url) {[weak self] data, response, error in
       // ensure there is no error for this HTTP response
       guard error == nil else {
         print ("error: \(error!)")
-        self?.delegate?.didReceiveError(.responseError)
         completion(.failure(.responseError))
         return
       }
@@ -62,7 +51,6 @@ class Networking {
       // ensure there is data returned from this HTTP response
       guard let content = data else {
         print("No data")
-        self?.delegate?.didReceiveError(.dataNotFoundError)
         completion(.failure(.dataNotFoundError))
         return
       }
@@ -70,15 +58,20 @@ class Networking {
       // serialise the data / NSData object into Dictionary [String : Any]
       guard let json = (try? JSONSerialization.jsonObject(with: content, options: JSONSerialization.ReadingOptions.mutableContainers)) as? [String: Any] else {
         print("Not containing JSON")
-        self?.delegate?.didReceiveError(.jsonParserError)
         completion(.failure(.jsonParserError))
-
         return
       }
-
-      print("gotten json response dictionary is \n \(json)")
-      self?.delegate?.didReceiveResponse("gotten json response dictionary is \n \(json)")
-      completion(.success("gotten json response dictionary is \n \(json)"))
+      let resultArray = json["results"] as! [[String:Any]]
+      let resultCount = json["resultCount"] as! Int
+      var arrAlbums = [Album]()
+      for result in resultArray {
+        let album = Album(trackName: result["trackName"] as! String, artworkUrl100: result["artworkUrl100"] as! String, collectionName: result["collectionName"] as? String)
+        arrAlbums.append(album)
+      }
+      let albums = Albums(resultCount: resultCount, results: arrAlbums)
+      print(albums)
+      //print("gotten json response dictionary is \n \(json)")
+      completion(.success(albums))
       // update UI using the response here
     }
 
