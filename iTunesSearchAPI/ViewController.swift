@@ -46,14 +46,6 @@ class ViewController: UIViewController {
       DispatchQueue.main.async {
         switch result {
         case .success(let response):
-//          let decoder = JSONDecoder()
-//
-//          do {
-//              let decoded = try decoder.decode([Albums].self, from: data)
-//              print(decoded[0].name)
-//          } catch {
-//              print("Failed to decode JSON")
-//          }
           self?.album = response.results
           self?.tableView.reloadData()
           break

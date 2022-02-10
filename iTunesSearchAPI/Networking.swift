@@ -54,25 +54,20 @@ class Networking {
         completion(.failure(.dataNotFoundError))
         return
       }
-
-      // serialise the data / NSData object into Dictionary [String : Any]
-      guard let json = (try? JSONSerialization.jsonObject(with: content, options: JSONSerialization.ReadingOptions.mutableContainers)) as? [String: Any] else {
-        print("Not containing JSON")
+      let decoder = JSONDecoder()
+      do {
+        let albums = try decoder.decode(Albums.self, from: content)
+          print(albums)
+          completion(.success(albums))
+// Make Albums or Album Struct model confirms to Codable protocol
+//        let encoder = JSONEncoder()
+//        let result = try? encoder.encode(albums)
+//        print(String(data:result!, encoding:.utf8)!)
+//
+      } catch {
+        print(error.localizedDescription)
         completion(.failure(.jsonParserError))
-        return
       }
-      let resultArray = json["results"] as! [[String:Any]]
-      let resultCount = json["resultCount"] as! Int
-      var arrAlbums = [Album]()
-      for result in resultArray {
-        let album = Album(trackName: result["trackName"] as! String, artworkUrl100: result["artworkUrl100"] as! String, collectionName: result["collectionName"] as? String)
-        arrAlbums.append(album)
-      }
-      let albums = Albums(resultCount: resultCount, results: arrAlbums)
-      print(albums)
-      //print("gotten json response dictionary is \n \(json)")
-      completion(.success(albums))
-      // update UI using the response here
     }
 
     // execute the HTTP request
