@@ -14,6 +14,7 @@ struct Location: Decodable {
 
 struct Day: Decodable {
   var maxtemp_f: Double
+  var condition: DayWeatherCondition
 }
 
 struct ForceCastDay: Decodable {
@@ -23,6 +24,10 @@ struct ForceCastDay: Decodable {
 
 struct Forecast: Decodable {
   var forecastday: [ForceCastDay]
+}
+
+struct DayWeatherCondition: Decodable {
+  var icon: String
 }
 
 struct Weather: Decodable {

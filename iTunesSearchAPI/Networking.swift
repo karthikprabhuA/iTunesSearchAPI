@@ -7,7 +7,7 @@
 
 import Foundation
 
-typealias CompletionHandler = (Result<Albums,Networking.NetworkError>) -> Void
+typealias CompletionHandler = (Result<Weather,Networking.NetworkError>) -> Void
 
 class Networking {
 
@@ -56,7 +56,7 @@ class Networking {
       }
       let decoder = JSONDecoder()
       do {
-        let albums = try decoder.decode(Albums.self, from: content)
+        let albums = try decoder.decode(Weather.self, from: content)
           print(albums)
           completion(.success(albums))
 // Make Albums or Album Struct model confirms to Codable protocol

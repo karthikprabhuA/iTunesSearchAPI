@@ -14,7 +14,7 @@ class ViewController: UIViewController {
 
   var saveData: String = ""
   var forceCastDays = [ForceCastDay]()
-
+  private let weatherTableViewCellIdentifier = "WeatherTableViewCellIdentifier"
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -28,7 +28,8 @@ class ViewController: UIViewController {
   }
 
   func setUpTableView() {
-    self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "basicStyleCell")
+//    self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "rightDetailCellIdentifier")
+    self.tableView.register(UINib(nibName: "WeatherTableViewCell", bundle: nil), forCellReuseIdentifier: weatherTableViewCellIdentifier)
   }
 
   fileprivate func downloadAndshowAppleLogo() {
@@ -79,14 +80,27 @@ extension ViewController: UITableViewDataSource {
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     // Ask for a cell of the appropriate type.
-     let cell = tableView.dequeueReusableCell(withIdentifier: "basicStyleCell", for: indexPath)
-    
-     // Configure the cell’s contents with the row and section number.
-     // The Basic cell style guarantees a label view is present in textLabel.
-    var config = cell.defaultContentConfiguration()
-    config.text = "\(forceCastDays[indexPath.row].day.maxtemp_f)"
-    config.secondaryText = "\(forceCastDays[indexPath.row].date)"
-    cell.contentConfiguration = config
+//    let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherTableViewCellIdentifier", for: indexPath)
+//    var cellConfig = UIListContentConfiguration.subtitleCell()
+//    cellConfig.text = "\(forceCastDays[indexPath.row].day.maxtemp_f)"
+//    cellConfig.image =  UIImage(named: "calendar_icon")
+//    cellConfig.secondaryText = forceCastDays[indexPath.row].date
+//    cell.contentConfiguration = cellConfig
+    let cell = UITableViewCell()
+
+    let cell = tableView.dequeueReusableCell(withIdentifier: weatherTableViewCellIdentifier, for: indexPath) as! WeatherTableViewCell
+    cell.rightTextLabel.text = "\(forceCastDays[indexPath.row].day.maxtemp_f)"
+    cell.leftTextLabel.text = forceCastDays[indexPath.row].date
+
+    DispatchQueue.global(qos: .userInitiated).async {
+      var iconUrlString = self.forceCastDays[indexPath.row].day.condition.icon
+      if let url = URL(string: "https:\(iconUrlString)"),
+         let imageData = try? Data(contentsOf: url) {
+        DispatchQueue.main.async {
+             cell.imageIconView.image = UIImage(data: imageData)
+        }
+      }
+    }
      return cell
   }
 }
@@ -94,6 +108,7 @@ extension ViewController: UITableViewDataSource {
 extension ViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     print(forceCastDays[indexPath.row].day.maxtemp_f)
+    performSegue(withIdentifier: "WeatherDetailViewcontrollerIdentifier", sender: nil)
     }
 }
 

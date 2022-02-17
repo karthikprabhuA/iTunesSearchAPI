@@ -12,5 +12,6 @@ class HomeViewController: UIViewController {
 
   @IBAction func buttontapped(_ sender: UIButton) {
     print("buttonTapped")
+    performSegue(withIdentifier: "showViewcontrollerIdentifier", sender: nil)
   }
 }
