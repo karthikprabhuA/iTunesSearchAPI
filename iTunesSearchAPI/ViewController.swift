@@ -86,7 +86,6 @@ extension ViewController: UITableViewDataSource {
 //    cellConfig.image =  UIImage(named: "calendar_icon")
 //    cellConfig.secondaryText = forceCastDays[indexPath.row].date
 //    cell.contentConfiguration = cellConfig
-    let cell = UITableViewCell()
 
     let cell = tableView.dequeueReusableCell(withIdentifier: weatherTableViewCellIdentifier, for: indexPath) as! WeatherTableViewCell
     cell.rightTextLabel.text = "\(forceCastDays[indexPath.row].day.maxtemp_f)"
