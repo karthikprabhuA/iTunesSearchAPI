@@ -14,10 +14,13 @@ class ViewController: UIViewController {
 
   var saveData: String = ""
   var forceCastDays = [ForceCastDay]()
+  private var queue:OperationQueue!
+
   private let weatherTableViewCellIdentifier = "WeatherTableViewCellIdentifier"
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    queue = OperationQueue()
+    queue.maxConcurrentOperationCount = 1
     let view = UIView(frame: CGRect(x: 60, y: 70, width: 100, height: 100))
     view.backgroundColor = .red
     self.view.addSubview(view)
@@ -33,16 +36,16 @@ class ViewController: UIViewController {
   }
 
   fileprivate func downloadAndshowAppleLogo() {
-    DispatchQueue.global(qos: .userInitiated).async {
-      do {
-        let imageData = try Data(contentsOf: URL(string: "https://1000logos.net/wp-content/uploads/2016/10/Apple-Logo.png")!)
-        DispatchQueue.main.async {
-          self.imageView.image = UIImage(data: imageData)
-        }
-      } catch {
-        print(error.localizedDescription)
+    let logoDownloadOperation = DownloadOperation(with: "https://1000logos.net/wp-content/uploads/2016/10/Apple-Logo.png")
+    logoDownloadOperation.index = 100
+    logoDownloadOperation.completionBlock = {
+      print(logoDownloadOperation.index)
+      DispatchQueue.main.async {
+        self.imageView.image = UIImage(data: logoDownloadOperation.data!)
       }
     }
+    queue.addOperation(logoDownloadOperation)
+
   }
 
   fileprivate func getiTunesAPI() {
@@ -79,27 +82,20 @@ extension ViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    // Ask for a cell of the appropriate type.
-//    let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherTableViewCellIdentifier", for: indexPath)
-//    var cellConfig = UIListContentConfiguration.subtitleCell()
-//    cellConfig.text = "\(forceCastDays[indexPath.row].day.maxtemp_f)"
-//    cellConfig.image =  UIImage(named: "calendar_icon")
-//    cellConfig.secondaryText = forceCastDays[indexPath.row].date
-//    cell.contentConfiguration = cellConfig
-
     let cell = tableView.dequeueReusableCell(withIdentifier: weatherTableViewCellIdentifier, for: indexPath) as! WeatherTableViewCell
     cell.rightTextLabel.text = "\(forceCastDays[indexPath.row].day.maxtemp_f)"
     cell.leftTextLabel.text = forceCastDays[indexPath.row].date
 
-    DispatchQueue.global(qos: .userInitiated).async {
-      var iconUrlString = self.forceCastDays[indexPath.row].day.condition.icon
-      if let url = URL(string: "https:\(iconUrlString)"),
-         let imageData = try? Data(contentsOf: url) {
+    let iconUrlString = "https:" + self.forceCastDays[indexPath.row].day.condition.icon
+      let downloadOperation = DownloadOperation(with: iconUrlString)
+      downloadOperation.index = indexPath.row
+      downloadOperation.completionBlock = {
+        print(downloadOperation.index)
         DispatchQueue.main.async {
-             cell.imageIconView.image = UIImage(data: imageData)
+         cell.imageIconView.image = UIImage(data: downloadOperation.data!)
         }
       }
-    }
+     queue.addOperation(downloadOperation)
      return cell
   }
 }
@@ -111,3 +107,19 @@ extension ViewController: UITableViewDelegate {
     }
 }
 
+class DownloadOperation: Operation {
+
+  private var urlString: String
+  var index: Int!
+  var data: Data?
+  init(with urlString: String) {
+    self.urlString = urlString
+  }
+
+  override func main() {
+    if let url = URL(string: self.urlString),
+       let imageData = try? Data(contentsOf: url) {
+      self.data = imageData
+    }
+  }
+}
