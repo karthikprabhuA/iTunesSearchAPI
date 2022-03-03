@@ -10,6 +10,11 @@ import UIKit
 
 class HomeViewController: UIViewController {
 
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    print("HomeViewController:" + (Networking.sharedInstance.lastURL ?? "No Last URL"))
+  }
+
   @IBAction func buttontapped(_ sender: UIButton) {
     print("buttonTapped")
     performSegue(withIdentifier: "showViewcontrollerIdentifier", sender: nil)

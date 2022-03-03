@@ -43,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CC1F922A27CF8D350092F468 /* iTunesSearchAPI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iTunesSearchAPI.entitlements; sourceTree = "<group>"; };
 		CC75C61727B1479300040856 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		CC75C61927B294FF00040856 /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		CC7BA04327BA74A700821C5F /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
@@ -113,6 +114,7 @@
 		CCE42A4527A8E5C800AD0219 /* iTunesSearchAPI */ = {
 			isa = PBXGroup;
 			children = (
+				CC1F922A27CF8D350092F468 /* iTunesSearchAPI.entitlements */,
 				CC7BA06227BA797600821C5F /* Networking.swift */,
 				CCE42A4627A8E5C800AD0219 /* AppDelegate.swift */,
 				CCE42A4827A8E5C800AD0219 /* SceneDelegate.swift */,
@@ -465,6 +467,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iTunesSearchAPI/iTunesSearchAPI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CW9QUM7523;
@@ -494,6 +497,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iTunesSearchAPI/iTunesSearchAPI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CW9QUM7523;

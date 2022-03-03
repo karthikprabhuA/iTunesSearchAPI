@@ -10,7 +10,13 @@ import Foundation
 typealias CompletionHandler = (Result<Weather,Networking.NetworkError>) -> Void
 
 class Networking {
+  var lastURL: String?
+  static let sharedInstance = Networking()
 
+  private init() {
+    //singleton
+  }
+  
   enum NetworkError: Error {
     case badURLError
     case jsonParserError
@@ -33,6 +39,7 @@ class Networking {
   }
   //
   func getData(for url: String, completion: @escaping CompletionHandler) {
+    self.lastURL = url
     let config = URLSessionConfiguration.default
     let session = URLSession(configuration: config)
     guard let url = URL(string: url) else {
